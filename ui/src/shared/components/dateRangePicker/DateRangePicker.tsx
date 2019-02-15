@@ -1,5 +1,5 @@
 // Libraries
-import React, {PureComponent} from 'react'
+import React, {PureComponent, createRef, CSSProperties} from 'react'
 
 // Components
 import DatePicker from 'src/shared/components/dateRangePicker/DatePicker'
@@ -15,39 +15,65 @@ import {ClickOutside} from '../ClickOutside'
 interface Props {
   timeRange: TimeRange
   onSetTimeRange: (timeRange: TimeRange) => void
-  onClickOutside: () => void
+  position: {top: number; right: number}
+  onClose: () => void
 }
 
 interface State {
   lower: string
   upper: string
+  bottomPosition?: number
+  topPosition?: number
 }
 
 class DateRangePicker extends PureComponent<Props, State> {
+  private rangePickerRef = createRef<HTMLDivElement>()
+
   constructor(props: Props) {
     super(props)
     const {
       timeRange: {lower, upper},
     } = props
 
-    this.state = {lower, upper}
+    this.state = {lower, upper, bottomPosition: null}
+  }
+
+  public componentDidMount() {
+    const {
+      bottom,
+      top,
+      height,
+    } = this.rangePickerRef.current.getBoundingClientRect()
+
+    if (bottom > window.innerHeight) {
+      this.setState({bottomPosition: height / 2})
+    } else if (top < 0) {
+      this.setState({topPosition: height / 2})
+    }
   }
 
   public render() {
-    const {onClickOutside} = this.props
+    const {onClose} = this.props
     const {upper, lower} = this.state
 
     return (
-      <ClickOutside onClickOutside={onClickOutside}>
-        <div className="range-picker react-datepicker-ignore-onclickoutside">
+      <ClickOutside onClickOutside={onClose}>
+        <div
+          className="range-picker react-datepicker-ignore-onclickoutside"
+          ref={this.rangePickerRef}
+          style={this.stylePosition}
+        >
+          <button className="range-picker--dismiss" onClick={onClose} />
           <div className="range-picker--date-pickers">
             <DatePicker
               dateTime={lower}
               onSelectDate={this.handleSelectLower}
+              label="Start"
             />
             <DatePicker
               dateTime={upper}
               onSelectDate={this.handleSelectUpper}
+              label="Stop"
             />
           </div>
           <Button
@@ -59,6 +85,28 @@ class DateRangePicker extends PureComponent<Props, State> {
         </div>
       </ClickOutside>
     )
+  }
+
+  private get stylePosition(): CSSProperties {
+    const {
+      position: {top, right},
+    } = this.props
+    const {bottomPosition, topPosition} = this.state
+    const pickerHeight = 374
+
+    if (topPosition) {
+      return {
+        top: '14px',
+        right: `${right + 2}px`,
+      }
+    }
+
+    const bottomPx =
+      (bottomPosition || window.innerHeight - top - 15) - pickerHeight / 2
+    return {
+      bottom: `${bottomPx}px`,
+      right: `${right + 2}px`,
+    }
   }
 
   private handleSetTimeRange = (): void => {

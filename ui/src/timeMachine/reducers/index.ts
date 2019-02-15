@@ -814,7 +814,7 @@ const buildActiveQuery = (draftState: TimeMachineState) => {
   const draftQuery = draftState.draftQueries[draftState.activeQueryIndex]
 
   if (isConfigValid(draftQuery.builderConfig)) {
-    draftQuery.text = buildQuery(draftQuery.builderConfig)
+    draftQuery.text = buildQuery(draftQuery.builderConfig, draftState.timeRange)
   } else {
     draftQuery.text = ''
   }
@@ -825,7 +825,7 @@ const buildAndSubmitAllQueries = (draftState: TimeMachineState) => {
     .filter(query => query.editMode === QueryEditMode.Builder)
     .forEach(query => {
       if (isConfigValid(query.builderConfig)) {
-        query.text = buildQuery(query.builderConfig)
+        query.text = buildQuery(query.builderConfig, draftState.timeRange)
       } else {
         query.text = ''
       }

@@ -1,6 +1,10 @@
-import {BuilderConfig} from 'src/types/v2'
+import {BuilderConfig, TimeRange} from 'src/types/v2'
 import {FUNCTIONS} from 'src/timeMachine/constants/queryBuilder'
-import {TIME_RANGE_START, WINDOW_PERIOD} from 'src/shared/constants'
+import {
+  TIME_RANGE_START,
+  WINDOW_PERIOD,
+  TIME_RANGE_STOP,
+} from 'src/shared/constants'
 
 export function isConfigValid(builderConfig: BuilderConfig): boolean {
   const {buckets, tags} = builderConfig
@@ -12,15 +16,20 @@ export function isConfigValid(builderConfig: BuilderConfig): boolean {
   return isConfigValid
 }
 
-export function buildQuery(builderConfig: BuilderConfig): string {
+export function buildQuery(
+  builderConfig: BuilderConfig,
+  timeRange: TimeRange
+): string {
   const {functions} = builderConfig
 
   let query: string
 
   if (functions.length) {
-    query = functions.map(f => buildQueryHelper(builderConfig, f)).join('\n\n')
+    query = functions
+      .map(f => buildQueryHelper(builderConfig, timeRange, f))
+      .join('\n\n')
   } else {
-    query = buildQueryHelper(builderConfig)
+    query = buildQueryHelper(builderConfig, timeRange)
   }
 
   return query
@@ -28,18 +37,26 @@ export function buildQuery(builderConfig: BuilderConfig): string {
 
 function buildQueryHelper(
   builderConfig: BuilderConfig,
+  timeRange: TimeRange,
   fn?: BuilderConfig['functions'][0]
 ): string {
   const [bucket] = builderConfig.buckets
+  const rangeCall = buildRangeFunction(timeRange)
   const tagFilterCall = formatTagFilterCall(builderConfig.tags)
   const fnCall = fn ? formatFunctionCall(fn) : ''
-
-  const rangeCall = `|> range(start: ${TIME_RANGE_START})`
 
   const query = `from(bucket: "${bucket}")
   ${rangeCall}${tagFilterCall}${fnCall}`
 
   return query
+}
+
+function buildRangeFunction(timeRange: TimeRange) {
+  if (timeRange.upper) {
+    return `|> range(start: ${TIME_RANGE_START}, stop: ${TIME_RANGE_STOP})`
+  }
+
+  return `|> range(start: ${TIME_RANGE_START})`
 }
 
 export function formatFunctionCall(fn: BuilderConfig['functions'][0]) {
