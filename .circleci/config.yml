@@ -37,7 +37,7 @@ jobs:
           command: bash ~/project/etc/litmus_fail_notify.sh Nightly
       - store_artifacts:
           path: ~/project
- 
+
   jstest:
     docker:
       - image: circleci/golang:1.11-node-browsers
@@ -179,7 +179,7 @@ jobs:
           root: .
           paths:
             - etc/litmus_success_notify.sh
-            - etc/litmus_fail_notify.sh 
+            - etc/litmus_fail_notify.sh
 
   release:
     docker:
