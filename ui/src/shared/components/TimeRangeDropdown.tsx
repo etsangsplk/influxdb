@@ -1,5 +1,7 @@
 // Libraries
 import React, {PureComponent, createRef} from 'react'
+import {get} from 'lodash'
+import moment from 'moment'
 
 // Components
 import {Dropdown} from 'src/clockface'
@@ -62,11 +64,26 @@ class TimeRangeDropdown extends PureComponent<Props, State> {
 
   private get timeRange(): TimeRange {
     const {timeRange} = this.props
-    // const date = new Date().toISOString()
-    // return {...TIME_RANGES[0], upper: date, lower: date}
+    const {isDatePickerOpen} = this.state
 
-    if (timeRange.label === 'Date Picker') {
-      return timeRange
+    if (isDatePickerOpen) {
+      const date = new Date().toISOString()
+      return {
+        label: 'Date Picker',
+        lower: date,
+        upper: date,
+      }
+    }
+
+    if (
+      get(timeRange, 'label', '') === 'Date Picker' ||
+      timeRange.upper ||
+      moment(timeRange.lower).isValid()
+    ) {
+      return {
+        ...timeRange,
+        label: `${timeRange.lower} - ${timeRange.upper}`,
+      }
     }
 
     const selectedTimeRange = TIME_RANGES.find(t => t.lower === timeRange.lower)
@@ -79,10 +96,7 @@ class TimeRangeDropdown extends PureComponent<Props, State> {
   }
 
   private get isDatePickerVisible() {
-    return (
-      this.state.isDatePickerOpen &&
-      this.props.timeRange.label === 'Date Picker'
-    )
+    return this.state.isDatePickerOpen
   }
 
   private handleApplyTimeRange = (timeRange: TimeRange) => {
@@ -99,11 +113,6 @@ class TimeRangeDropdown extends PureComponent<Props, State> {
     const timeRange = TIME_RANGES.find(t => t.label === label)
 
     if (label === 'Date Picker') {
-      const date = new Date().toISOString()
-      timeRange.lower = date
-      timeRange.upper = date
-      onSetTimeRange(timeRange)
-
       const {top, left} = this.dropdownRef.current.getBoundingClientRect()
       const right = window.innerWidth - left
       this.setState({isDatePickerOpen: true, dropdownPosition: {top, right}})

@@ -15,6 +15,8 @@ interface Props {
 }
 
 class DatePicker extends PureComponent<Props> {
+  private inCurrentMonth: boolean = false
+
   public render() {
     const {dateTime, label} = this.props
     const date = new Date(dateTime)
@@ -35,8 +37,9 @@ class DatePicker extends PureComponent<Props> {
             popperContainer={this.popperContainer}
             popperClassName="range-picker--popper"
             calendarClassName="range-picker--calendar"
-            dayClassName={() => 'range-picker--day'}
+            dayClassName={this.dayClassName}
             timeIntervals={60}
+            fixedHeight={true}
           />
         </div>
       </FormLabel>
@@ -46,12 +49,26 @@ class DatePicker extends PureComponent<Props> {
   private get customInput() {
     return (
       <Input
-        widthPixels={310}
+        widthPixels={314}
         size={ComponentSize.Medium}
         customClass="range-picker--input react-datepicker-ignore-onclickoutside"
         titleText="Start"
       />
     )
+  }
+
+  private dayClassName = (date: Date) => {
+    const day = date.getDate()
+
+    if (day === 1) {
+      this.inCurrentMonth = !this.inCurrentMonth
+    }
+
+    if (this.inCurrentMonth) {
+      return 'range-picker--day-in-month'
+    }
+
+    return 'range-picker--day'
   }
 
   private popperContainer({children}): JSX.Element {

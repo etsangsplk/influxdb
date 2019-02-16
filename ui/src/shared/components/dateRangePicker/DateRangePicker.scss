@@ -13,7 +13,7 @@
   padding: $ix-marg-b;
   border-radius: $ix-radius;
   z-index: 9999;
-  height: 374px;
+  height: 410px;
   
   .react-datepicker {
     font-family: $ix-text-font;
@@ -24,6 +24,7 @@
     flex-wrap: nowrap;
     display: flex;
     flex-direction: row;
+    align-items: center;
     margin: $ix-marg-b 0;
 
     .range-picker--date-picker {
@@ -34,6 +35,7 @@
       .range-picker--popper {
         position: relative !important;
         transform: none !important;
+        @include no-user-select();
 
         .range-picker--calendar {
           background-color: transparent;
@@ -41,9 +43,42 @@
           color: $c-pool;
           display: inline-flex;
           flex-direction: row;
+
+          .react-datepicker__navigation {
+            outline: none;
+            cursor: pointer;
+          }
+
+          .react-datepicker__navigation--next {
+            border-left-color: $g18-cloud;
+          }
+
+          .react-datepicker__navigation--previous {
+            border-right-color: $g18-cloud;
+          }
           
           .range-picker--day {
+            color: $c-void;
+            font-weight: 400;
+
+            &:hover {
+              background-color: $c-laser;
+              color: $g20-white;
+            }
+          }
+
+          .range-picker--day-in-month {
             color: $c-star;
+            
+            &:hover {
+              background-color: $c-laser;
+              color: $g20-white;
+            }
+          }
+
+          .react-datepicker__day--selected {
+            background-color: $c-pool;
+            color: $g18-cloud;
           }
 
           .react-datepicker__triangle {
@@ -55,11 +90,17 @@
             padding: 0;
             border: none;
             background: transparent;
+
+            .react-datepicker__day-name {
+              color: $c-rainforest;
+            }
             
             .react-datepicker__current-month {
               width: 100%;
               border-radius: $ix-radius $ix-radius 0 0;
               background-color: $g4-onyx;
+              color: $g18-cloud;
+              font-weight: 700;
               height: $ix-marg-d;
               display: inline-flex;
               flex-direction: row;
@@ -80,6 +121,7 @@
               width: 100%;
               border-radius: $ix-radius $ix-radius 0 0;
               background-color: $g4-onyx;
+              font-weight: 700;
               height: $ix-marg-d;
               display: inline-flex;
               flex-direction: row;
@@ -87,16 +129,29 @@
               align-items: center;
             }
 
+            .react-datepicker-time__header {
+              color: $g18-cloud;
+            }
+
             .react-datepicker__time {
               background-color: transparent;
 
               .react-datepicker__time-box {
                 width: 100%;
-                background-color: $g3-castle;
+                background-color: $g2-kevlar;
                 color: $g18-cloud;
 
                 .react-datepicker__time-list {
                   font-size: $ix-text-base;
+
+                  .react-datepicker__time-list-item:hover {
+                    background-color: $c-laser;
+                    color: $g20-white;
+                  }
+
+                  .react-datepicker__time-list-item--selected {
+                    background-color: $c-pool;
+                  }
                 }
               }
             }

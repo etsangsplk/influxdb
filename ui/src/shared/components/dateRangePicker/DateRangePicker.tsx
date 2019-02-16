@@ -15,7 +15,7 @@ import {ClickOutside} from '../ClickOutside'
 interface Props {
   timeRange: TimeRange
   onSetTimeRange: (timeRange: TimeRange) => void
-  position: {top: number; right: number}
+  position?: {top: number; right: number}
   onClose: () => void
 }
 
@@ -88,11 +88,15 @@ class DateRangePicker extends PureComponent<Props, State> {
   }
 
   private get stylePosition(): CSSProperties {
-    const {
-      position: {top, right},
-    } = this.props
+    const {position} = this.props
     const {bottomPosition, topPosition} = this.state
-    const pickerHeight = 374
+    const pickerHeight = 410
+
+    if (!position) {
+      return
+    }
+
+    const {top, right} = position
 
     if (topPosition) {
       return {
